@@ -48,6 +48,16 @@ function makeRow( stuff ) {
 		);
 }
 
+function outputList( queryresult ) {
+	var ul = $('<ul></ul>');
+	$.each( queryresult, function( index, value ) {
+		ul.append( makeRow( value ) );
+	} );
+	var thing = $('#thing');
+	thing.text('');
+	thing.append( ul );
+}
+
 function getWatchlist( wiki ) {
 	var url, params, cur, realData;
 	url = 'https://' + wiki + '/w/api.php';
@@ -77,16 +87,6 @@ function getWatchlist( wiki ) {
 		cur.sort(automagicalSort);
 		outputList( cur );
 	} )
-}
-
-function outputList( queryresult ) {
-	var ul = $('<ul></ul>');
-	$.each( queryresult, function( index, value ) {
-		ul.append( makeRow( value ) );
-	} );
-	var thing = $('#thing');
-	thing.text('');
-	thing.append( ul );
 }
 
 //getWatchlist( 'meta.wikimedia.org' );
