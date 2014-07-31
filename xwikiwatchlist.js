@@ -89,9 +89,9 @@ function outputList( queryresult ) {
 		// TODO: Add <h4>'s above the latest edit of each day
 		ul.append( makeRow( value, index % 2 === 1 ) );
 	} );
-	var thing = $('#mw-content-text');//$('#thing');
-	thing.text('');
-	thing.append( ul );
+	$( '.mw-changeslist' ).first()
+		.empty()
+		.append( ul );
 }
 
 function getWatchlist() {
