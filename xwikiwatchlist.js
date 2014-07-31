@@ -12,37 +12,6 @@ function makeCORSRequest( wikiapi, params, callback ) {
 	} );
 }
 
-function getWatchlist( wiki ) {
-	var url, params, cur, realData;
-	url = 'https://' + wiki + '/w/api.php';
-	params = {
-		action: 'query',
-		list: 'watchlist',
-		wlprop: 'title|ids|sizes|timestamp|user|parsedcomment',
-		wltype: 'edit',
-		wllimit: '100'
-	};
-	makeCORSRequest( url, params, function ( data ) {
-		realData = [];
-		$.each( data.query.watchlist, function( i, val ) {
-			val.url = wiki;
-			realData.push( val );
-		} );
-		cur = window.wgWatchlist;
-		if ( cur == undefined ) {
-			cur = [];
-		}
-		cur = cur.concat(realData);
-		window.wgWatchlist = cur;
-		function automagicalSort(a, b) {
-			// Reverse sort by time
-			return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-		}
-		cur.sort(automagicalSort);
-		outputList( cur );
-	} )
-}
-
 function makeRow( stuff ) {
 	return $('<li></li>')
 		.append('( ')
@@ -77,6 +46,37 @@ function makeRow( stuff ) {
 				.addClass('editsummary')
 				.html( stuff.parsedcomment.replace(new RegExp('"/wiki/', 'g'), '"//' + stuff.url + '/wiki/') )
 		);
+}
+
+function getWatchlist( wiki ) {
+	var url, params, cur, realData;
+	url = 'https://' + wiki + '/w/api.php';
+	params = {
+		action: 'query',
+		list: 'watchlist',
+		wlprop: 'title|ids|sizes|timestamp|user|parsedcomment',
+		wltype: 'edit',
+		wllimit: '100'
+	};
+	makeCORSRequest( url, params, function ( data ) {
+		realData = [];
+		$.each( data.query.watchlist, function( i, val ) {
+			val.url = wiki;
+			realData.push( val );
+		} );
+		cur = window.wgWatchlist;
+		if ( cur == undefined ) {
+			cur = [];
+		}
+		cur = cur.concat(realData);
+		window.wgWatchlist = cur;
+		function automagicalSort(a, b) {
+			// Reverse sort by time
+			return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+		}
+		cur.sort(automagicalSort);
+		outputList( cur );
+	} )
 }
 
 function outputList( queryresult ) {
