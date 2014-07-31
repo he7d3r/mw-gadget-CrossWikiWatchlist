@@ -1,3 +1,16 @@
+/**
+ * Cross-Wiki Watchlist
+ * @author: [[User:Helder.wiki]]
+ * @author: [[User:Legoktm]]
+ * @tracking: [[Special:GlobalUsage/User:Helder.wiki/Tools/Cross-Wiki Watchlist.js]] ([[File:User:Helder.wiki/Tools/Cross-Wiki Watchlist.js]])
+ */
+/*jshint browser:true, camelcase:true, curly:true, eqeqeq:true, immed:true, latedef:true,
+newcap:true, noarg:true, noempty:true, nonew:true, quotmark:true, undef:true, unused:true,
+strict:true, trailing:true, maxlen:120, evil:true, onevar:true */
+/*global jQuery, mediaWiki */
+( function ( mw, $ ) {
+'use strict';
+
 function makeCORSRequest( wiki, params ) {
 	var dfd = $.Deferred(),
 		// FIXME: this may be different depending on the wiki configuration
@@ -154,3 +167,5 @@ if( mw.config.get( 'wgPageName' ) === 'Special:Watchlist/global' ){
 		);
 	} );
 }
+
+}( mediaWiki, jQuery ) );
