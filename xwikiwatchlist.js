@@ -197,6 +197,16 @@ if( mw.config.get( 'wgCanonicalSpecialPageName' ) === 'Watchlist' && /\/cw$/.tes
 		mw.loader.using( [ 'mediawiki.util', 'user.options' ] )
 	)
 	.then( function(){
+		var projects = mw.user.options.get(
+			'userjs-cw-watchlist',
+			[
+				mw.config.get( 'wgUserLanguage' ).split('-')[0] + '.wikipedia.org',
+				'meta.wikimedia.org'
+			]
+		);
+		if ( typeof projects === 'string' ){
+			projects = JSON.parse( projects );
+		}
 		$target = $( '.mw-changeslist' ).first();
 		if ( !$target.length ){
 			$target = $( '#mw-content-text' );
@@ -215,16 +225,7 @@ if( mw.config.get( 'wgCanonicalSpecialPageName' ) === 'Watchlist' && /\/cw$/.tes
 			'li.proj-commons { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/4/47/Wikimedia_Commons_favicon.png); }',
 			'li.proj-meta { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wikimedia_Community_Logo.svg/16px-Wikimedia_Community_Logo.svg.png); }'
 		].join( '\n' ) );
-		getWatchlist.apply(
-			this,
-			mw.user.options.get(
-				'userjs-cw-watchlist',
-				[
-					mw.config.get( 'wgUserLanguage' ).split('-')[0] + '.wikipedia.org',
-					'meta.wikimedia.org'
-				]
-			)
-		);
+		getWatchlist.apply( this, projects );
 	} );
 }
 
