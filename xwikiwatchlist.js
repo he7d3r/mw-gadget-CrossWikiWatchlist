@@ -99,9 +99,9 @@ function makeRow( stuff, isOddLine ) {
 				.attr( 'href', '//' + stuff.url + '/wiki/Special:Contributions/' + encodeURIComponent( stuff.user ) )
 				.text( 'contribs' ),
 			') ',
-			$( '<span></span>' )
+			stuff.comment === '' ? '' : $( '<span></span>' )
 				.addClass( 'comment' )
-				.html( stuff.parsedcomment.replace(new RegExp('"/wiki/', 'g'), '"//' + stuff.url + '/wiki/') )
+				.html( stuff.parsedcomment.replace( /\/wiki\//g, '"//' + stuff.url + '/wiki/') )
 				.prepend( '(' )
 				.append( ')' )
 		);
