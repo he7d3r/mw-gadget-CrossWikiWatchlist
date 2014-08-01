@@ -11,6 +11,8 @@ strict:true, trailing:true, maxlen:120, evil:true, onevar:true */
 ( function ( mw, $ ) {
 'use strict';
 
+var $target;
+
 function makeCORSRequest( wiki, params ) {
 	var dfd = $.Deferred(),
 		// FIXME: this may be different depending on the wiki configuration
@@ -39,54 +41,75 @@ function makeRow( stuff, isOddLine ) {
 			.replace( /^www\.(mediawiki|wikidata)\.org$/, '$1' )
 			.replace( /^(meta|commons|species|incubator)\.wikimedia\.org$/, '$1' )
 			.replace( /^.+?\./, '' )
-			.replace( /\.org$/, '' );
+			.replace( /\.org$/, '' ),
+		pad = function( n ){
+			return n < 10 ? '0' + n : n.toString();
+		},
+		delta = stuff.newlen - stuff.oldlen,
+		deltaClass = delta > 0 ?
+			'mw-plusminus-pos' :
+			delta === 0 ?
+				'mw-plusminus-null' :
+				'mw-plusminus-neg',
+		sep = '<span class="mw-changeslist-separator">. .</span> ';
 		
 	classes.push( projClass );
 	classes.push( isOddLine ? 'mw-line-odd' : 'mw-line-even' );
 	return $('<li></li>')
 		.addClass( classes.join( ' ' ) )
 		// [[MediaWiki:parentheses]]
-		.append('(')
 		.append(
+			'(',
+			$( '<a></a>' )
+				.attr( 'href', '//' + stuff.url + '/?diff=' + stuff.revid )
+				.text( 'diff' ),
+			// [[MediaWiki:pipe-separator]]
+			' | ',
+			$( '<a></a>' )
+				.attr( 'href', '//' + stuff.url + '/?action=history&curid=' + stuff.pageid )
+				.text( 'hist' ),
+			// [[MediaWiki:parentheses]]
+			')  ',
+			sep,
+			$( '<a></a>' )
+				.attr( 'href', '//' + stuff.url + '/wiki/' + encodeURIComponent( stuff.title ) )
+				.text( stuff.title ),
+			'; ',
+			pad( stuff.timestamp.getUTCHours() ),
+			':',
+			pad( stuff.timestamp.getUTCMinutes() ),
+			sep,
+			$( '<span></span>' )
+				.addClass( deltaClass )
+				.append(
+					'(',
+					delta > 0 ? '+' + delta : delta,
+					') '
+				),
+			sep,
 			$('<a></a>')
-				.attr('href', 'https://' + stuff.url + '/?diff=' + stuff.revid)
-				.text('diff')
-		)
-		// [[MediaWiki:pipe-separator]]
-		.append( ' | ')
-		.append(
+				.attr( 'href', '//' + stuff.url + '/wiki/User:' + encodeURIComponent( stuff.user ) )
+				.text( stuff.user ),
+			' (',
 			$('<a></a>')
-				.attr('href', 'https://' + stuff.url + '/?action=history&curid=' + stuff.pageid)
-				.text('hist')
-		)
-		// [[MediaWiki:parentheses]]
-		.append( ')  ' )
-		.append( '<span class="mw-changeslist-separator">. .</span> ' )
-		.append(
+				.attr( 'href', '//' + stuff.url + '/wiki/User_talk:' + encodeURIComponent( stuff.user ) )
+				.text( 'talk' ),
+			' | ',
 			$('<a></a>')
-				.attr('href', 'https://' + stuff.url + '/wiki/' + encodeURIComponent( stuff.title ) )
-				.text( stuff.title )
-		)
-		// FIXME: make timestamp pretty
-		// FIXME: add diff size
-		.append( '; ' + stuff.timestamp + ' .. ')
-		.append(
-			$('<a></a>')
-				.attr('href', 'https://' + stuff.url + '/wiki/User:' + encodeURIComponent( stuff.user ) )
-				.text( stuff.user )
-		)
-		.append( ' ' )
-		.append(
-			$('<span></span>')
-				.addClass('editsummary')
+				.attr( 'href', '//' + stuff.url + '/wiki/Special:Contributions/' + encodeURIComponent( stuff.user ) )
+				.text( 'contribs' ),
+			') ',
+			$( '<span></span>' )
+				.addClass( 'comment' )
 				.html( stuff.parsedcomment.replace(new RegExp('"/wiki/', 'g'), '"//' + stuff.url + '/wiki/') )
+				.prepend( '(' )
+				.append( ')' )
 		);
 }
 
 function outputList( queryresult ) {
-	var $target = $( '.mw-changeslist' ).first().empty(),
-		curDay = new Date(),
-		ul;
+	var ul,
+		curDay = new Date();
 	curDay.setUTCHours(0,0,0,0);
 	curDay.setUTCDate( curDay.getUTCDate() + 1 );
 	$.each( queryresult, function( index, value ) {
@@ -156,6 +179,7 @@ if( mw.config.get( 'wgPageName' ) === 'Special:Watchlist/global' ){
 		$.ready,
 	mw.loader.using( [ 'mediawiki.util' ] ) )
 	.then( function(){
+		$target = $( '.mw-changeslist' ).first().empty();
 		mw.util.addCSS( [
 			'.proj-wikibooks { list-style-image: url(//bits.wikimedia.org/favicon/wikibooks.ico); }',
 			'.proj-wikinews { list-style-image: url(//bits.wikimedia.org/favicon/wikinews.ico); }',
