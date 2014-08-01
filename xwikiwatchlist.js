@@ -99,7 +99,7 @@ function makeRow( stuff, isOddLine ) {
 				.attr( 'href', '//' + stuff.url + '/wiki/Special:Contributions/' + encodeURIComponent( stuff.user ) )
 				.text( 'contribs' ),
 			') ',
-			stuff.comment === '' ? '' : $( '<span></span>' )
+			stuff.parsedcomment === '' ? '' : $( '<span></span>' )
 				.addClass( 'comment' )
 				.html( stuff.parsedcomment.replace( /\/wiki\//g, '"//' + stuff.url + '/wiki/') )
 				.prepend( '(' )
@@ -156,13 +156,14 @@ function getWatchlist() {
 			// Reverse sort by time
 			return b.timestamp.getTime() - a.timestamp.getTime();
 		}
+		function process( key, val ) {
+			val.url = watchlists[i][0];
+			val.timestamp = new Date( val.timestamp );
+			realData.push( val );
+		}
 		realData = [];
 		for( i = 0; i < watchlists.length; i++ ){
-			$.each( watchlists[i][1].query.watchlist, function( key, val ) {
-				val.url = watchlists[i][0];
-				val.timestamp = new Date( val.timestamp );
-				realData.push( val );
-			} );
+			$.each( watchlists[i][1].query.watchlist, process );
 		}
 		cur = window.wgWatchlist || [];
 		cur = cur.concat( realData );
