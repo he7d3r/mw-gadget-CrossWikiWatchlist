@@ -6,7 +6,7 @@
  */
 /*jshint browser:true, camelcase:true, curly:true, eqeqeq:true, immed:true, latedef:true,
 newcap:true, noarg:true, noempty:true, nonew:true, quotmark:true, undef:true, unused:true,
-strict:true, trailing:true, maxlen:120, evil:true, onevar:true */
+strict:true, trailing:true, maxlen:180, evil:true, onevar:true */
 /*global jQuery, mediaWiki */
 ( function ( mw, $ ) {
 'use strict';
@@ -16,25 +16,28 @@ var $target;
 function makeCORSRequest( wiki, params ) {
 	var dfd = $.Deferred(),
 		// FIXME: this may be different depending on the wiki configuration
-		wikiapi = 'https://' + wiki + '/w/api.php';
-	params.format = 'json';
-	// TODO: allow usage on other wikis?
-	params.origin = 'https://meta.wikimedia.org';
-	$.ajax( {
-		'url': wikiapi,
-		'data': params,
-		'xhrFields': {
+		wikiapi = 'https://' + wiki + '/w/api.php',
+		ajaxParams = {
+			'url': wikiapi,
+			'data': params,
+			'dataType': 'json'
+		};
+	if( wiki !== location.host ){
+		params.origin = 'https://' + location.host;
+		ajaxParams.xhrFields = {
 			'withCredentials': true
-		},
-		'dataType': 'json'
-	} )
+		};
+	}
+	$.ajax( ajaxParams )
 	.done( function( data ) {
 		dfd.resolve( wiki, data );
 	} )
 	.fail( dfd.reject );
+	params.origin = undefined;
 	return dfd.promise();
 }
 
+// TODO: Bot edits, minor edits
 function makeRow( stuff, isOddLine ) {
 	var classes = [ 'mw-changeslist-line-watched' ],
 		projClass = 'proj-' + stuff.url
@@ -139,6 +142,7 @@ function getWatchlist() {
 	// has precedence over the local preferences?
 	params = {
 		action: 'query',
+		format: 'json',
 		list: 'watchlist',
 		wlprop: 'title|ids|sizes|timestamp|user|parsedcomment',
 		wltype: 'edit',
@@ -175,33 +179,35 @@ function getWatchlist() {
 	} );
 }
 
-if( mw.config.get( 'wgPageName' ) === 'Special:Watchlist/global' ){
+if( mw.config.get( 'wgCanonicalSpecialPageName' ) === 'Watchlist' && /\/cw$/.test( mw.config.get( 'wgTitle' ) ) ){
 	$.when(
 		$.ready,
-	mw.loader.using( [ 'mediawiki.util' ] ) )
+		mw.loader.using( [ 'mediawiki.util', 'user.options' ] )
+	)
 	.then( function(){
 		$target = $( '.mw-changeslist' ).first().empty();
 		mw.util.addCSS( [
-			'.proj-wikibooks { list-style-image: url(//bits.wikimedia.org/favicon/wikibooks.ico); }',
-			'.proj-wikinews { list-style-image: url(//bits.wikimedia.org/favicon/wikinews.ico); }',
-			'.proj-wikipedia { list-style-image: url(//bits.wikimedia.org/favicon/wikipedia.ico); }',
-			'.proj-wikiquote { list-style-image: url(//bits.wikimedia.org/favicon/wikiquote.ico); }',
-			'.proj-wikisource { list-style-image: url(//bits.wikimedia.org/favicon/wikisource.ico); }',
-			'.proj-wikiversity { list-style-image: url(//bits.wikimedia.org/favicon/wikiversity.ico); }',
-			'.proj-wikivoyage { list-style-image: url(//bits.wikimedia.org/favicon/wikivoyage.ico); }',
-			'.proj-wiktionary { list-style-image: url(//bits.wikimedia.org/favicon/wiktionary/en.ico); }',
-			'.proj-mediawiki { list-style-image: url(//bits.wikimedia.org/favicon/mediawiki.ico); }',
-			'.proj-commons { list-style-image: url(//bits.wikimedia.org/favicon/commons.ico); }'
+			'li.proj-wikibooks { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/e/ec/Wikibooks-favicon.png); }',
+			'li.proj-wikinews { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/a/ac/Wikinews-favicon.png); }',
+			'li.proj-wikipedia { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/b/b0/Wikipedia-favicon.png); }',
+			'li.proj-wikiquote { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/8/8c/Wikiquote-favicon.png); }',
+			'li.proj-wikisource { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/3/3e/Wikisource-favicon.png); }',
+			'li.proj-wikiversity { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/4/4b/Wikiversity-favicon.png); }',
+			'li.proj-wikivoyage { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Wikivoyage_favicon.svg/16px-Wikivoyage_favicon.svg.png); }',
+			'li.proj-wiktionary { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/thumb/8/83/En.wiktionary_favicon.svg/16px-En.wiktionary_favicon.svg.png); }',
+			'li.proj-mediawiki { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/thumb/b/bb/MediaWiki-notext.svg/16px-MediaWiki-notext.svg.png); }',
+			'li.proj-commons { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/4/47/Wikimedia_Commons_favicon.png); }',
+			'li.proj-meta { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wikimedia_Community_Logo.svg/16px-Wikimedia_Community_Logo.svg.png); }'
 		].join( '\n' ) );
-		getWatchlist(
-			'en.wikipedia.org',
-			'en.wiktionary.org',
-			'pt.wikipedia.org',
-			'pt.wikibooks.org',
-			// 'meta.wikimedia.org', // Forbidden (why?)
-			'www.mediawiki.org',
-			'commons.wikimedia.org',
-			'br.wikimedia.org'
+		getWatchlist.apply(
+			this,
+			mw.user.options.get(
+				'userjs-cw-watchlist',
+				[
+					mw.config.get( 'wgUserLanguage' ).split('-')[0] + '.wikipedia.org',
+					'meta.wikimedia.org'
+				]
+			)
 		);
 	} );
 }
