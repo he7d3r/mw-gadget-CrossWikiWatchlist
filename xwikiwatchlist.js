@@ -84,14 +84,27 @@ function makeRow( stuff, isOddLine ) {
 }
 
 function outputList( queryresult ) {
-	var ul = $('<ul class="special"></ul>');
+	var $target = $( '.mw-changeslist' ).first().empty(),
+		curDay = new Date(),
+		ul;
+	curDay.setUTCHours(0,0,0,0);
+	curDay.setUTCDate( curDay.getUTCDate() + 1 );
 	$.each( queryresult, function( index, value ) {
-		// TODO: Add <h4>'s above the latest edit of each day
+		if( value.timestamp < curDay ){
+			if( ul ){
+				$target.append( ul );
+			}
+			ul = $( '<ul class="special"></ul>' );
+			curDay.setDate( curDay.getDate() - 1 );
+			$target.append( $( '<h4></h4>' ).text( [
+				value.timestamp.getUTCDate(),
+				mw.config.get( 'wgMonthNames' )[value.timestamp.getUTCMonth()+1],
+				value.timestamp.getUTCFullYear(),
+			].join( ' ' ) ) );
+		}
 		ul.append( makeRow( value, index % 2 === 1 ) );
 	} );
-	$( '.mw-changeslist' ).first()
-		.empty()
-		.append( ul );
+	$target.append( ul );
 }
 
 function getWatchlist() {
