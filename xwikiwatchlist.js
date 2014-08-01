@@ -55,7 +55,7 @@ function makeRow( stuff, isOddLine ) {
 				'mw-plusminus-null' :
 				'mw-plusminus-neg',
 		sep = '<span class="mw-changeslist-separator">. .</span> ';
-		
+
 	classes.push( projClass );
 	classes.push( isOddLine ? 'mw-line-odd' : 'mw-line-even' );
 	return $('<li></li>')
@@ -148,7 +148,7 @@ function getWatchlist() {
 		wltype: 'edit',
 		wllimit: '50'
 	};
-	
+
 	var i, promises = [];
 	for ( i = 0; i < wikis.length; i++ ) {
 		promises.push( makeCORSRequest( wikis[i], params ) );
@@ -167,7 +167,19 @@ function getWatchlist() {
 		}
 		realData = [];
 		for( i = 0; i < watchlists.length; i++ ){
-			$.each( watchlists[i][1].query.watchlist, process );
+			if ( watchlists[i][1].error ){
+				$target.prepend(
+					$( '<div class="error"></div>' ).append(
+						watchlists[i][0],
+						': ',
+						watchlists[i][1].error.code,
+						': ',
+						watchlists[i][1].error.info
+					)
+				);
+			} else {
+				$.each( watchlists[i][1].query.watchlist, process );
+			}
 		}
 		cur = window.wgWatchlist || [];
 		cur = cur.concat( realData );
@@ -185,7 +197,11 @@ if( mw.config.get( 'wgCanonicalSpecialPageName' ) === 'Watchlist' && /\/cw$/.tes
 		mw.loader.using( [ 'mediawiki.util', 'user.options' ] )
 	)
 	.then( function(){
-		$target = $( '.mw-changeslist' ).first().empty();
+		$target = $( '.mw-changeslist' ).first();
+		if ( !$target.length ){
+			$target = $( '#mw-content-text' );
+		}
+		$target.empty();
 		mw.util.addCSS( [
 			'li.proj-wikibooks { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/e/ec/Wikibooks-favicon.png); }',
 			'li.proj-wikinews { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/a/ac/Wikinews-favicon.png); }',
