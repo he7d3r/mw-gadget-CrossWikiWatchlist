@@ -117,7 +117,7 @@ function makeRow( stuff, isOddLine ) {
 			') ',
 			stuff.parsedcomment === '' ? '' : $( '<span></span>' )
 				.addClass( 'comment' )
-				.html( stuff.parsedcomment.replace( /\/wiki\//g, '"//' + stuff.url + '/wiki/') )
+				.html( stuff.parsedcomment.replace( /"\/wiki\//g, '"//' + stuff.url + '/wiki/') )
 				.prepend( '(' )
 				.append( ')' )
 		);
