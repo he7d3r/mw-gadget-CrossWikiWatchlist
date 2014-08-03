@@ -88,6 +88,7 @@ function makeRow( stuff, isOddLine ) {
 				.text( 'b' ) : '',
 			' ',
 			$( '<a></a>' )
+				.addClass( 'mw-changeslist-title' )
 				.attr( 'href', '//' + stuff.url + '/wiki/' + encodeURIComponent( stuff.title ) )
 				.text( stuff.title ),
 			'; ',
