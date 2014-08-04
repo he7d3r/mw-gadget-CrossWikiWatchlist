@@ -87,10 +87,14 @@ function makeRow( stuff, isOddLine ) {
 				.attr( 'title', 'This edit was performed by a bot' )
 				.text( 'b' ) : '',
 			' ',
-			$( '<a></a>' )
-				.addClass( 'mw-changeslist-title' )
-				.attr( 'href', '//' + stuff.url + '/wiki/' + encodeURIComponent( stuff.title ) )
-				.text( stuff.title ),
+			$( '<span></span>' )
+				.addClass( 'mw-title' )
+				.append(
+					$( '<a></a>' )
+						.addClass( 'mw-changeslist-title' )
+						.attr( 'href', '//' + stuff.url + '/wiki/' + encodeURIComponent( stuff.title ) )
+						.text( stuff.title )
+				),
 			'; ',
 			pad( stuff.timestamp.getUTCHours() ),
 			':',
