@@ -39,7 +39,7 @@ function makeCORSRequest( wiki, params ) {
 
 // TODO: Bot edits, minor edits
 function makeRow( stuff, isOddLine ) {
-	var classes = [ 'mw-changeslist-line-watched' ],
+	var classes = [],
 		projClass = 'proj-' + stuff.url
 			.replace( /^www\.(mediawiki|wikidata)\.org$/, '$1' )
 			.replace( /^(meta|commons|species|incubator)\.wikimedia\.org$/, '$1' )
@@ -57,6 +57,11 @@ function makeRow( stuff, isOddLine ) {
 		sep = '<span class="mw-changeslist-separator">. .</span> ';
 
 	classes.push( projClass );
+	if ( stuff.notificationtimestamp !== '' && stuff.timestamp >= new Date( stuff.notificationtimestamp ) ){
+		classes.push( 'mw-changeslist-line-watched' );
+	} else {
+		classes.push( 'mw-changeslist-line-not-watched' );
+	}
 	classes.push( isOddLine ? 'mw-line-odd' : 'mw-line-even' );
 	return $('<li></li>')
 		.addClass( classes.join( ' ' ) )
@@ -164,7 +169,7 @@ function getWatchlist( wikis, extraParams ) {
 		action: 'query',
 		format: 'json',
 		list: 'watchlist',
-		wlprop: 'flags|ids|parsedcomment|sizes|timestamp|title|user',
+		wlprop: 'flags|ids|notificationtimestamp|parsedcomment|sizes|timestamp|title|user',
 		wltype: 'edit',
 		wllimit: '50'
 	};
@@ -179,14 +184,14 @@ function getWatchlist( wikis, extraParams ) {
 	$.when.apply( $, promises )
 	.done( function () {
 		var i, watchlists = Array.prototype.slice.call( arguments );
-		function automagicalSort(a, b) {
-			// Reverse sort by time
-			return b.timestamp.getTime() - a.timestamp.getTime();
-		}
 		function process( key, val ) {
 			val.url = watchlists[i][0];
 			val.timestamp = new Date( val.timestamp );
 			realData.push( val );
+		}
+		function automagicalSort(a, b) {
+			// Reverse sort by time
+			return b.timestamp.getTime() - a.timestamp.getTime();
 		}
 		realData = [];
 		for( i = 0; i < watchlists.length; i++ ){
