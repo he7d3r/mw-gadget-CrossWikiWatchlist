@@ -1,10 +1,8 @@
-xwiki-watchlist
+CrossWikiWatchlist
 ===============
 
-JS based cross-wiki watchlist tool thing.
+JavaScript based tool to monitor watchlists from more than one wiki in
+a single page.
 
-Still only at a proof of concept stage.
-
-Idea: Use CORS to fetch watchlists from whatever wikis the user wants, compile into one list, and sort by timestamp, and then re-render the output.
-
-Code released into the public domain.
+Uses CORS to fetch watchlists from whatever wikis the user wants,
+compile into one list, and sort by timestamp, and then re-render the output.
