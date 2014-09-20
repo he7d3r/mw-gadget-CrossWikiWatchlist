@@ -3,7 +3,6 @@
  * @author: Helder (https://github.com/he7d3r)
  * @author: Legoktm (https://github.com/legoktm)
  * @license: CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0/>
- * @tracking: [[Special:GlobalUsage/User:Helder.wiki/Tools/Cross-Wiki Watchlist.js]] ([[File:User:Helder.wiki/Tools/Cross-Wiki Watchlist.js]])
  */
 /*jshint browser:true, camelcase:true, curly:true, eqeqeq:true, immed:true, latedef:true,
 newcap:true, noarg:true, noempty:true, nonew:true, quotmark:true, undef:true, unused:true,
