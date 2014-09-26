@@ -4,10 +4,6 @@
  * @author: Legoktm (https://github.com/legoktm)
  * @license: CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0/>
  */
-/*jshint browser:true, camelcase:true, curly:true, eqeqeq:true, immed:true, latedef:true,
-newcap:true, noarg:true, noempty:true, nonew:true, quotmark:true, undef:true, unused:true,
-strict:true, trailing:true, maxlen:180, evil:true, onevar:true */
-/*global jQuery, mediaWiki */
 ( function ( mw, $ ) {
 'use strict';
 
@@ -148,7 +144,7 @@ function outputList( queryresult ) {
 			$target.append( $( '<h4></h4>' ).text( [
 				value.timestamp.getUTCDate(),
 				mw.config.get( 'wgMonthNames' )[value.timestamp.getUTCMonth()+1],
-				value.timestamp.getUTCFullYear(),
+				value.timestamp.getUTCFullYear()
 			].join( ' ' ) ) );
 		}
 		ul.append( makeRow( value, index % 2 === 1 ) );
