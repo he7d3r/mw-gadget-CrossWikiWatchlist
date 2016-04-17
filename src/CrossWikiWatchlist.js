@@ -1,5 +1,6 @@
 /**
  * Cross-Wiki Watchlist
+ *
  * @author: Helder (https://github.com/he7d3r)
  * @author: Legoktm (https://github.com/legoktm)
  * @license: CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0/>
@@ -14,14 +15,14 @@
 			// FIXME: this may be different depending on the wiki configuration
 			wikiapi = 'https://' + wiki + '/w/api.php',
 			ajaxParams = {
-				'url': wikiapi,
-				'data': params,
-				'dataType': 'json'
+				url: wikiapi,
+				data: params,
+				dataType: 'json'
 			};
 		if ( wiki !== location.host ) {
 			params.origin = 'https://' + location.host;
 			ajaxParams.xhrFields = {
-				'withCredentials': true
+				withCredentials: true
 			};
 		}
 		$.ajax( ajaxParams )
@@ -59,7 +60,7 @@
 			classes.push( 'mw-changeslist-line-not-watched' );
 		}
 		classes.push( isOddLine ? 'mw-line-odd' : 'mw-line-even' );
-		return $('<li></li>')
+		return $( '<li></li>' )
 			.addClass( classes.join( ' ' ) )
 			// [[MediaWiki:parentheses]]
 			.append(
@@ -109,21 +110,21 @@
 						') '
 					),
 				sep,
-				$('<a></a>')
+				$( '<a></a>' )
 					.attr( 'href', '//' + stuff.url + '/wiki/User:' + encodeURIComponent( stuff.user ) )
 					.text( stuff.user ),
 				' (',
-				$('<a></a>')
+				$( '<a></a>' )
 					.attr( 'href', '//' + stuff.url + '/wiki/User_talk:' + encodeURIComponent( stuff.user ) )
 					.text( 'talk' ),
 				' | ',
-				$('<a></a>')
+				$( '<a></a>' )
 					.attr( 'href', '//' + stuff.url + '/wiki/Special:Contributions/' + encodeURIComponent( stuff.user ) )
 					.text( 'contribs' ),
 				') ',
 				stuff.parsedcomment === '' ? '' : $( '<span></span>' )
 					.addClass( 'comment' )
-					.html( stuff.parsedcomment.replace( /"\/wiki\//g, '"//' + stuff.url + '/wiki/') )
+					.html( stuff.parsedcomment.replace( /"\/wiki\//g, '"//' + stuff.url + '/wiki/' ) )
 					.prepend( '(' )
 					.append( ')' )
 			);
@@ -132,7 +133,7 @@
 	function outputList( queryresult ) {
 		var ul,
 			curDay = new Date();
-		curDay.setUTCHours(0, 0, 0, 0);
+		curDay.setUTCHours( 0, 0, 0, 0 );
 		curDay.setUTCDate( curDay.getUTCDate() + 1 );
 		$.each( queryresult, function ( index, value ) {
 			if ( value.timestamp < curDay ) {
@@ -143,7 +144,7 @@
 				curDay.setDate( curDay.getDate() - 1 );
 				$target.append( $( '<h4></h4>' ).text( [
 					value.timestamp.getUTCDate(),
-					mw.config.get( 'wgMonthNames' )[value.timestamp.getUTCMonth() + 1],
+					mw.config.get( 'wgMonthNames' )[ value.timestamp.getUTCMonth() + 1 ],
 					value.timestamp.getUTCFullYear()
 				].join( ' ' ) ) );
 			}
@@ -174,34 +175,34 @@
 		}
 
 		for ( i = 0; i < wikis.length; i++ ) {
-			promises.push( makeCORSRequest( wikis[i], params ) );
+			promises.push( makeCORSRequest( wikis[ i ], params ) );
 		}
 		$.when.apply( $, promises )
 		.done( function () {
 			var i, watchlists = Array.prototype.slice.call( arguments );
 			function process( key, val ) {
-				val.url = watchlists[i][0];
+				val.url = watchlists[ i ][ 0 ];
 				val.timestamp = new Date( val.timestamp );
 				realData.push( val );
 			}
-			function automagicalSort(a, b) {
+			function automagicalSort( a, b ) {
 				// Reverse sort by time
 				return b.timestamp.getTime() - a.timestamp.getTime();
 			}
 			realData = [];
 			for ( i = 0; i < watchlists.length; i++ ) {
-				if ( watchlists[i][1].error ) {
+				if ( watchlists[ i ][ 1 ].error ) {
 					$target.prepend(
 						$( '<div class="error"></div>' ).append(
-							watchlists[i][0],
+							watchlists[ i ][ 0 ],
 							': ',
-							watchlists[i][1].error.code,
+							watchlists[ i ][ 1 ].error.code,
 							': ',
-							watchlists[i][1].error.info
+							watchlists[ i ][ 1 ].error.info
 						)
 					);
 				} else {
-					$.each( watchlists[i][1].query.watchlist, process );
+					$.each( watchlists[ i ][ 1 ].query.watchlist, process );
 				}
 			}
 			cur = window.wgWatchlist || [];
@@ -218,7 +219,7 @@
 			projects = mw.user.options.get(
 				'userjs-cw-watchlist',
 				[
-					mw.config.get( 'wgUserLanguage' ).split('-')[0] + '.wikipedia.org',
+					mw.config.get( 'wgUserLanguage' ).split( '-' )[ 0 ] + '.wikipedia.org',
 					'meta.wikimedia.org'
 				]
 			),
@@ -250,10 +251,10 @@
 			for ( param in map ) {
 				switch ( mw.util.getParamValue( param ) ) {
 					case '1':
-						params.show.push( '!' + map[param] );
+						params.show.push( '!' + map[ param ] );
 						break;
 					case '0':
-						params.show.push( map[param] );
+						params.show.push( map[ param ] );
 						break;
 				}
 			}
