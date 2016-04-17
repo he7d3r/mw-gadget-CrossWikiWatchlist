@@ -215,7 +215,8 @@
 		} );
 	}
 	function run() {
-		var $wlLinks = $( '#mw-watchlist-form' ).find( 'a' ),
+		var $form = $( '#mw-watchlist-form' )
+				.attr( 'action', mw.util.getUrl( 'Special:Watchlist/cw' ) ),
 			projects = mw.user.options.get(
 				'userjs-cw-watchlist',
 				[
@@ -232,34 +233,30 @@
 			$target = $( '#mw-content-text' );
 		}
 		$target.empty();
-		$wlLinks = $wlLinks.filter( function () {
-			return mw.util.getParamValue( 'title', $( this ).attr( 'href' ) ) !== null;
-		} ).each( function () {
-			var $this = $( this ),
-				newTitle = 'Special:Watchlist/cw',
-				href = $this.attr( 'href' )
-					.replace( /([&?])title=[^&#]*/, '$1title=' + newTitle ),
-				param,
-				map = {
-					hideminor: 'minor',
-					hidebots: 'bot',
-					hideanons: 'anon',
-					hidepatrolled: 'patrolled'
-				};
+		params.show = [
+			$( '#hideminor' ).is( ':checked' ) ?
+				'!minor' :
+				'minor',
+			$( '#hidebots' ).is( ':checked' ) ?
+				'!bot' :
+				'bot',
+			$( '#hideanons' ).is( ':checked' ) ?
+				'!anon' :
+				'anon',
+			$( '#hidepatrolled' ).is( ':checked' ) ?
+				'!patrolled' :
+				'patrolled'
 			// TODO: Implement 'hideliu' and 'hidemyself'
-			params.show = [];
-			for ( param in map ) {
-				switch ( mw.util.getParamValue( param ) ) {
-					case '1':
-						params.show.push( '!' + map[ param ] );
-						break;
-					case '0':
-						params.show.push( map[ param ] );
-						break;
-				}
-			}
-			$this.attr( 'href', href );
-		} );
+			/*
+				,
+				$( '#hideliu' ).is( ':checked' ) ?
+					'!TODO' :
+					'TODO',
+				$( '#hidemyself' ).is( ':checked' ) ?
+					'!TODO' :
+					'TODO'
+			*/
+		];
 		mw.util.addCSS( [
 			'li.proj-wikibooks { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/e/ec/Wikibooks-favicon.png); }',
 			'li.proj-wikinews { list-style-image: url(//upload.wikimedia.org/wikipedia/commons/a/ac/Wikinews-favicon.png); }',
